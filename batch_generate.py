@@ -68,14 +68,42 @@ def batch_generate(filename):
     cv2.destroyAllWindows()
     # print("count: ", len(batches))
     return batches
-    
+
+def playHit(filename):
+    cap = cv2.VideoCapture(filename)
+    while(cap.isOpened()):
+        ret, frame = cap.read()
+        if frame is not None:
+            if isDrum(frame):
+                frame = printText(frame, "hit")
+            cv2.imshow('Hit',frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+        else:
+            break
+
+def playVideo(filename):
+    cap = cv2.VideoCapture(filename)
+    while(cap.isOpened()):
+        ret, frame = cap.read()
+        if frame is not None:
+            cv2.imshow('Origin',frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+        else:
+            break
+        
     
 if __name__ == "__main__":
     
     dataroot = "../Data/"
     filename = "labeledvideo5.mp4"
-
+    
+    # playVideo(dataroot + filename)
+    # playHit(dataroot + filename)
+    
     batches = batch_generate(dataroot + filename)
+    
     count = len(batches)
     print("Generated: " + str(count) + " batches.")
     i = 1
@@ -88,7 +116,7 @@ if __name__ == "__main__":
                 img = printText(frame, str(i) + ". hit")
             else:
                 img = printText(frame, str(i) + ".")
-            cv2.imshow('frame',img)
+            cv2.imshow('Batch',img)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
                 
