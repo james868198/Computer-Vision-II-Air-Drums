@@ -39,7 +39,7 @@ def printText(frame, text):
 
 # print(frames[0].shape)
 
-def batch_generate(filename):
+def batch_generate(filename, shape):
     cap = cv2.VideoCapture(filename)
     batches = []
     queue = []
@@ -54,7 +54,8 @@ def batch_generate(filename):
                 queue.pop(0)
             
             check = isDrum(frame)
-            
+            if shape is not None: 
+                frame = cv2.resize(frame, shape)
             queue.append(frame)
             batch = queue.copy()
             if len(batch) == 5:
