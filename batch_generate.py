@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import time
+import pandas as pd
 
 def isDrum(frame):
     
@@ -52,7 +53,6 @@ def batch_generate(filename, shape):
             # print(str(count))
             if len(queue) == 5:
                 queue.pop(0)
-            
             check = isDrum(frame)
             if shape is not None: 
                 frame = cv2.resize(frame, shape)
@@ -93,33 +93,35 @@ def playVideo(filename):
                 break
         else:
             break
-        
     
 if __name__ == "__main__":
     
     dataroot = "../Data/"
     filename = "labeledvideo5.mp4"
-    
+    shape = (224, 224)
     # playVideo(dataroot + filename)
     # playHit(dataroot + filename)
     
-    batches = batch_generate(dataroot + filename)
-    
+    batches = batch_generate(dataroot + filename, shape)
+    print("batches:")
+    print(batches)
     count = len(batches)
     print("Generated: " + str(count) + " batches.")
-    i = 1
-    for batch, hit in batches:
-        # if hit is True:
-            # print(count, hit, len(batch))
-        for frame in batch:
-            if isDrum(frame) is True:
-                # printText(frame, "hit")
-                img = printText(frame, str(i) + ". hit")
-            else:
-                img = printText(frame, str(i) + ".")
-            cv2.imshow('Batch',img)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+    
+    # ----
+    # i = 1
+    # for batch, hit in batches:
+    #     # if hit is True:
+    #         # print(count, hit, len(batch))
+    #     for frame in batch:
+    #         if isDrum(frame) is True:
+    #             # printText(frame, "hit")
+    #             img = printText(frame, str(i) + ". hit")
+    #         else:
+    #             img = printText(frame, str(i) + ".")
+    #         cv2.imshow('Batch',img)
+    #         if cv2.waitKey(1) & 0xFF == ord('q'):
+    #             break
                 
-        i += 1
-        # time.sleep(1)
+    #     i += 1
+    #     # time.sleep(1)
