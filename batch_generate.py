@@ -1,7 +1,6 @@
 import numpy as np
 import cv2
 import time
-import pandas as pd
 
 def isDrum(frame):
     
@@ -93,7 +92,8 @@ def playVideo(filename):
                 break
         else:
             break
-    
+
+
 if __name__ == "__main__":
     
     dataroot = "../Data/"
@@ -104,7 +104,10 @@ if __name__ == "__main__":
     
     batches = batch_generate(dataroot + filename, shape)
     print("batches:")
-    print(batches)
+    print(batches[0][1])
+    print(batches[1][1])
+    print(batches[2][1])
+    print(batches[3][1])
     count = len(batches)
     print("Generated: " + str(count) + " batches.")
     
