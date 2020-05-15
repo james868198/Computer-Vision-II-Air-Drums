@@ -66,7 +66,7 @@ def batch_generate(filename, shape):
     print("Sampled " + str(count) + "frames.")
     # When everything done, release the capture
     cap.release()
-    cv2.destroyAllWindows()
+    # cv2.destroyAllWindows()
     # print("count: ", len(batches))
     return batches
 

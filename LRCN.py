@@ -5,7 +5,9 @@ from tensorflow.keras import Sequential
 from tensorflow.keras.applications.vgg16 import VGG16
 import batch_generate as bg
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
 from tensorflow.keras.utils import to_categorical
+import matplotlib.pyplot as plt
 import numpy as np
 
 batches = bg.batch_generate(filename = "../Data/labeledvideo5.mp4", shape = (224, 224))
@@ -57,14 +59,14 @@ testX = np.array(testX)
 testY = np.array(testY)
 
 H = model.fit(trainX, trainY, validation_data=(testX, testY),
-batch_size=32, epochs=100, verbose=1)
+batch_size=8, epochs=2, verbose=1)
 
 # evaluate the network
 print("[INFO] evaluating network...")
-predictions = model.predict(testX, batch_size=32)
+predictions = model.predict(testX, batch_size=8)
 print(classification_report(testY.argmax(axis=1),
     predictions.argmax(axis=1),
-    target_names=["hit", " "]))
+    target_names=["not hit", "hit"]))
 
 # plot the training loss and accuracy
 plt.style.use("ggplot")
