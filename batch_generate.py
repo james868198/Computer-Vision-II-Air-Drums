@@ -1,7 +1,10 @@
 import numpy as np
 import cv2
 import time
+import os
 
+DATA_ROOT = "../Data/"
+SHAPE = (224, 224)
 def isDrum(frame):
     
     def matchColor(pixel, color, thresh):
@@ -39,7 +42,7 @@ def printText(frame, text):
 
 # print(frames[0].shape)
 
-def batch_generate(filename, shape):
+def batch_generate(filename, shape=SHAPE):
     cap = cv2.VideoCapture(filename)
     batches = []
     queue = []
@@ -93,25 +96,41 @@ def playVideo(filename):
         else:
             break
 
+def readFiles(folder_path):
+    entries = os.listdir(folder_path)
+    print(entries)
+    # for file in entries:
+    #     batch_generate(folder_path+"/"+file,SHAPE)
+
+def writeLabel(path,labels):
+    with open(path, "w") as txt_file:
+        for label in labels:
+            txt_file.write(str(label) + "\n")
 
 if __name__ == "__main__":
     
-    dataroot = "../Data/"
+    
     filename = "labeledvideo5.mp4"
-    shape = (224, 224)
-    # playVideo(dataroot + filename)
-    # playHit(dataroot + filename)
+    labelFile = "label.txt"
     
-    batches = batch_generate(dataroot + filename, shape)
-    print("batches:")
-    print(batches[0][1])
-    print(batches[1][1])
-    print(batches[2][1])
-    print(batches[3][1])
-    count = len(batches)
-    print("Generated: " + str(count) + " batches.")
+    # playVideo(DATA_ROOT + filename)
+    # playHit(DATA_ROOT + filename)
     
-    # ----
+    # ---- generate batchs ----
+    # batches = batch_generate(DATA_ROOT + filename, shape)
+    # print("batches:")
+    # count = len(batches)
+    # print("Generated: " + str(count) + " batches.")
+
+    # ---- write label ----
+    # test_label = [1,0,-1]
+    # writeLabel(DATA_ROOT+labelFile,test_label)
+
+    # ---- read directory ----
+
+    readFiles(DATA_ROOT+"UCF-101/HammerThrow")
+
+    # ---- plot batches ----
     # i = 1
     # for batch, hit in batches:
     #     # if hit is True:
