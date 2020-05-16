@@ -3,8 +3,12 @@ import cv2
 import time
 import os
 
-DATA_ROOT = "../Data/"
+DATA_ROOT = "../Data/input/"
 SHAPE = (224, 224)
+INPUT_FILE_TYPE = {
+    "mp4":1,
+    "avi":1
+}
 def isDrum(frame):
     
     def matchColor(pixel, color, thresh):
@@ -99,19 +103,70 @@ def playVideo(filename):
 def readFiles(folder_path):
     entries = os.listdir(folder_path)
     print(entries)
-    # for file in entries:
-    #     batch_generate(folder_path+"/"+file,SHAPE)
+    for file in entries:
+        batch_generate(folder_path+"/"+file,SHAPE)
 
-def writeLabel(path,labels):
-    with open(path, "w") as txt_file:
-        for label in labels:
-            txt_file.write(str(label) + "\n")
+def generateLabels(directory):
+    entries = os.listdir(directory)
+    
+    for file in entries:
+        generateLabel(directory+file)
+
+def generateLabel(input_path):
+    print("[generateLabel] file:", input_path)
+    
+    # validate input file
+    if input_path == None or input_path == "":
+        return
+    if not os.path.exists(input_path):
+        return
+    dot_position = input_path.rfind(".")
+
+    if dot_position <0:
+        return
+    if input_path[dot_position+1:] not in INPUT_FILE_TYPE:
+        return
+    
+    output_path = input_path[:dot_position]+".csv"
+    
+    # is label existed
+    if os.path.exists(output_path):
+        return
+    labels = getLabelFromVideo(input_path)
+    if labels == None:
+        return
+    if len(labels) == 0:
+        return
+    with open(output_path, "w") as output_file:
+        for i, label in enumerate(labels):
+            output_file.write(str(label))
+            if i < len(labels)-1:
+                output_file.write(",")
+
+def getLabelFromVideo(filename):
+    cap = cv2.VideoCapture(filename)
+    labels = []
+    count = 0
+    while(cap.isOpened()):
+        ret, frame = cap.read()
+        if frame is not None:
+            # print(str(count))
+            labels.append(isDrum(frame))
+            count += 1
+        else:
+            break
+    print("Sampled " + str(count) + "frames.")
+    # When everything done, release the capture
+    cap.release()
+    # cv2.destroyAllWindows()
+    # print("count: ", len(batches))
+    return labels
 
 if __name__ == "__main__":
     
     
-    filename = "labeledvideo5.mp4"
-    labelFile = "label.txt"
+    # filename = "labeledvideo5.mp4"
+    filename = "v_ApplyEyeMakeup_g01_c01.avi"
     
     # playVideo(DATA_ROOT + filename)
     # playHit(DATA_ROOT + filename)
@@ -122,13 +177,11 @@ if __name__ == "__main__":
     # count = len(batches)
     # print("Generated: " + str(count) + " batches.")
 
-    # ---- write label ----
-    # test_label = [1,0,-1]
-    # writeLabel(DATA_ROOT+labelFile,test_label)
+    # ---- write labels for all video in a directory. output file name = [input_file_name}.csv ----
+    generateLabels(DATA_ROOT)
 
     # ---- read directory ----
-
-    readFiles(DATA_ROOT+"UCF-101/HammerThrow")
+    # readFiles(DATA_ROOT+"UCF-101/HammerThrow")
 
     # ---- plot batches ----
     # i = 1
