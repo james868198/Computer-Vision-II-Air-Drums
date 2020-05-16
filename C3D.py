@@ -17,13 +17,17 @@ pool_kernel_shape1 = (1,2,2)
 
 batch_size = 4
 input_data_shape =(5,224, 224, 3)
+directory = "../Data/input/"
 file_path = "../Data/labeledvideo5.mp4"
+
+
 class C3D:
-    def __init__(self,file):
-        self.file = file
+    def __init__(self,input = directory):
+        self.input = input
     def getData(self):
         print("\n[C3D][getData] start...")
-        batches = bg.batch_generate(filename = self.file, shape = (224, 224))
+        batches = bg.generateBatches(directory = self.input)
+        # batches = bg.generateBatch(filename = self.input, shape = (224, 224))
         data, labels = zip(*batches)
         (trainX, testX, trainY, testY) = train_test_split(data, labels, test_size=0.25, random_state=42)
         trainX = np.array(trainX)
@@ -78,5 +82,5 @@ class C3D:
         print("[C3D][train] end")
 
 if __name__ == "__main__":
-    model = C3D(file_path)
+    model = C3D()
     model.train()

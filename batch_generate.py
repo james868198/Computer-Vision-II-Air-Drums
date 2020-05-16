@@ -9,20 +9,22 @@ INPUT_FILE_TYPE = {
     "mp4":1,
     "avi":1
 }
+INPUT_FRAME_NUMBER = 5
+
 def isDrum(frame):
     
     def matchColor(pixel, color, thresh):
         pB, pG, pR = pixel[0], pixel[1], pixel[2]
         cB, cG, cR = color[0], color[1], color[2]
         if(abs(pB - cB)<thresh and abs(pG - cG)<thresh and abs(pR - cR)<thresh):
-            return True
+            return 1
         else:
-            return False
+            return 0
             
     if matchColor(frame[0][0], [0,0,0], 20) and matchColor(frame[0][-1], [0,0,255], 20) and matchColor(frame[-1][0], [255,0,0], 20) and matchColor(frame[-1][-1], [0,255,0], 20):
-        return True
+        return 1
     else:
-        return False
+        return 0
         
 def printText(frame, text):
     font = cv2.FONT_HERSHEY_SIMPLEX 
@@ -36,19 +38,51 @@ def printText(frame, text):
     out = cv2.putText(frame, text, org, font, fontScale, color, thickness, cv2.LINE_AA)
     
     return out
-    
-# frames = []
-# for i in range(22):
-#     ret, frame = cap.read()
-#     frames.append(frame)
-#     if(isDrum(frame)):
-#         print(frames[i][0][0])
 
-# print(frames[0].shape)
+def generateBatches(directory):
+    print("[generateBatchs]")
+    entries = os.listdir(directory)
+    print(entries)
+    batchs = []
+    for file in entries:
+        data = generateBatch(directory+file)
+        if data == None:
+            continue
+        batchs.extend(data)
+    return batchs
 
-def batch_generate(filename, shape=SHAPE):
-    cap = cv2.VideoCapture(filename)
+def generateBatch(input_path, shape=SHAPE):
+
     batches = []
+    # validate input file
+    if input_path == None or input_path == "":
+        return 
+    if not os.path.exists(input_path):
+        return 
+    dot_position = input_path.rfind(".")
+
+    if dot_position <0:
+        return 
+    if input_path[dot_position+1:] not in INPUT_FILE_TYPE:
+        return 
+    
+    label_path = input_path[:dot_position]+".csv"
+    
+    # get labels
+    if not os.path.exists(label_path):
+        return 
+    
+    labels = None
+    with open(label_path, "r") as file_data:
+        labels = file_data.read().split(',')
+    
+    if labels == None or len(labels) == 0:
+        return 
+    
+    # start parsing
+    print("[generateBatchs]")
+    cap = cv2.VideoCapture(input_path)
+
     queue = []
     count = 0
     while(cap.isOpened()):
@@ -57,19 +91,19 @@ def batch_generate(filename, shape=SHAPE):
     
         if frame is not None:
             # print(str(count))
-            if len(queue) == 5:
+            if len(queue) == INPUT_FRAME_NUMBER:
                 queue.pop(0)
-            check = isDrum(frame)
+            # check = isDrum(frame)
             if shape is not None: 
                 frame = cv2.resize(frame, shape)
             queue.append(frame)
             batch = queue.copy()
-            if len(batch) == 5:
-                batches.append((batch, check))
+            if len(batch) == INPUT_FRAME_NUMBER:
+                batches.append((batch, labels[count]))
             count += 1
         else:
             break
-    print("Sampled " + str(count) + "frames.")
+    print("Sampled batches size:", len(batches))
     # When everything done, release the capture
     cap.release()
     # cv2.destroyAllWindows()
@@ -100,24 +134,20 @@ def playVideo(filename):
         else:
             break
 
-def readFiles(folder_path):
-    entries = os.listdir(folder_path)
-    print(entries)
-    for file in entries:
-        batch_generate(folder_path+"/"+file,SHAPE)
+
 
 def generateLabels(directory):
     entries = os.listdir(directory)
-    
     for file in entries:
         generateLabel(directory+file)
+    return True
 
 def generateLabel(input_path):
     print("[generateLabel] file:", input_path)
     
     # validate input file
     if input_path == None or input_path == "":
-        return
+        return 
     if not os.path.exists(input_path):
         return
     dot_position = input_path.rfind(".")
@@ -142,7 +172,7 @@ def generateLabel(input_path):
             output_file.write(str(label))
             if i < len(labels)-1:
                 output_file.write(",")
-
+    return True
 def getLabelFromVideo(filename):
     cap = cv2.VideoCapture(filename)
     labels = []
@@ -171,18 +201,16 @@ if __name__ == "__main__":
     # playVideo(DATA_ROOT + filename)
     # playHit(DATA_ROOT + filename)
     
-    # ---- generate batchs ----
-    # batches = batch_generate(DATA_ROOT + filename, shape)
-    # print("batches:")
-    # count = len(batches)
-    # print("Generated: " + str(count) + " batches.")
-
     # ---- write labels for all video in a directory. output file name = [input_file_name}.csv ----
     generateLabels(DATA_ROOT)
 
-    # ---- read directory ----
-    # readFiles(DATA_ROOT+"UCF-101/HammerThrow")
+    # ---- generate batchs ----
+    # batches = generateBatches(DATA_ROOT)
+    # print("batches:",len(batches))
+    # print("Generated: " + str(count) + " batches.")
 
+    
+   
     # ---- plot batches ----
     # i = 1
     # for batch, hit in batches:

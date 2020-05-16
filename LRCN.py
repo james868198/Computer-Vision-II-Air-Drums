@@ -10,7 +10,7 @@ from tensorflow.keras.utils import to_categorical
 import matplotlib.pyplot as plt
 import numpy as np
 
-batches = bg.batch_generate(filename = "../Data/labeledvideo5.mp4", shape = (224, 224))
+batches = bg.generateBatches(directory = "../Data/input/")
 data, labels = zip(*batches)
 
 (trainX, testX, trainY, testY) = train_test_split(data, labels,
