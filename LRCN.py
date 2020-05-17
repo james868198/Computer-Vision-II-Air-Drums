@@ -58,11 +58,11 @@ trainY = np.array(trainY)
 testX = np.array(testX)
 testY = np.array(testY)
 
-# H = model.fit(trainX, trainY, validation_data=(testX, testY), batch_size=32, epochs=1, verbose=1)
+H = model.fit(trainX, trainY, validation_data=(testX, testY), batch_size=8, epochs=3, verbose=1)
 
 # evaluate the network
 print("[INFO] evaluating network...")
-predictions = model.predict(testX, batch_size=32)
+predictions = model.predict(testX, batch_size=8)
 print(classification_report(testY.argmax(axis=1),
     predictions.argmax(axis=1),
     target_names=["not hit", "hit"]))
