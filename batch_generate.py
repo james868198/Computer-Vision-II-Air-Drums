@@ -3,7 +3,7 @@ import cv2
 import time
 import os
 
-DATA_ROOT = "../Data/input/"
+DATA_ROOT = "../Data/test_input/"
 SHAPE = (224, 224)
 INPUT_FILE_TYPE = {
     "mp4":1,
@@ -202,7 +202,7 @@ if __name__ == "__main__":
     # playHit(DATA_ROOT + filename)
     
     # ---- write labels for all video in a directory. output file name = [input_file_name}.csv ----
-    generateLabels(DATA_ROOT)
+    # generateLabels(DATA_ROOT)
 
     # ---- generate batchs ----
     # batches = generateBatches(DATA_ROOT)
