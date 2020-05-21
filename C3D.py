@@ -27,11 +27,11 @@ CP_DIR = os.path.dirname(CP_PATH)
 class C3D:
     def __init__(self,input = DATA_ROOT):
         self.input = input
-        self.epoch_num = 1
+        self.epoch_num = 100
         self.output_size = 4
+        self.batch_size = 32
         self.conv_kernel_shape = (3,3,3)
         self.pool_kernel_shape1 = (1,2,2)
-        self.batch_size = 4
         self.input_data_shape =(5,224, 224, 3)
         self.targets = ["None","fist", "one finger", "stick"]
         self.pool_kernel_shape2 = (2,2,2)
@@ -51,6 +51,7 @@ class C3D:
         trainX = np.array(trainX)
         trainY = np.array(trainY)
         testX = np.array(testX)
+        testY = np.array(testY)
         testY = np.array(testY)
 
         trainY = keras.utils.to_categorical(trainY)
@@ -117,7 +118,8 @@ class C3D:
         # print("Restored model, accuracy: {:5.2f}%".format(100*acc))
 
 if __name__ == "__main__":
-    model = C3D()
+    print("Run CSD")
+    # model = C3D()
     
     # model.getData()
-    model.train()
+    # model.train()
