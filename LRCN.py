@@ -3,7 +3,7 @@ from tensorflow.keras.layers import Dense, LSTM, \
     Flatten, TimeDistributed, Conv2D, Dropout
 from tensorflow.keras import Sequential
 from tensorflow.keras.applications.vgg16 import VGG16
-import batch_generate as bg
+import tools/batch_generate as bg
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from tensorflow.keras.utils import to_categorical

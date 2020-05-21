@@ -5,7 +5,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 
 import numpy as np
-import batch_generate as bg
+from utils import batch_generate as bg
+
+
 import sys
 # conv_num = 8
 # pool_num = 5
@@ -18,8 +20,6 @@ pool_kernel_shape1 = (1,2,2)
 batch_size = 4
 input_data_shape =(5,224, 224, 3)
 directory = "../Data/input/"
-file_path = "../Data/labeledvideo5.mp4"
-
 
 class C3D:
     def __init__(self,input = directory):
