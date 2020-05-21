@@ -77,7 +77,11 @@ class LRCN():
         model.add(Dense(64, activation='relu'))
         # model.add(Dropout(.5))
         model.add(Dense(self.output_size, activation='softmax'))
+        
+        model.save(MODEL_PATH)
         model.compile('adam', loss='categorical_crossentropy')
+       
+        print(model.summary())
 
         # callbacks: early_stop, check_point
         es_callback = keras.callbacks.EarlyStopping(monitor='loss', patience=2)
