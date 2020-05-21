@@ -127,16 +127,6 @@ if __name__ == "__main__":
     
     
     # filename = "labeledvideo5.mp4"
-<<<<<<< HEAD:batch_generate.py
-    filename = "v_ApplyEyeMakeup_g01_c01.avi"
-    
-    # playVideo(DATA_ROOT + filename)
-    # playHit(DATA_ROOT + filename)
-    
-    # ---- write labels for all video in a directory. output file name = [input_file_name}.csv ----
-    # generateLabels(DATA_ROOT)
-=======
->>>>>>> james:utils/batch_generate.py
 
     # ---- generate batchs ----
     batches = generateBatches(DATA_ROOT)

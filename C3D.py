@@ -14,59 +14,52 @@ import os
 # conv_num = 8
 # pool_num = 5
 # fc_num = 2
-epoch_num = 1
-output_size = 4
-conv_kernel_shape = (3,3,3)
-pool_kernel_shape1 = (1,2,2)
-# pool_kernel_shape2 = (2,2,2)
 
-batch_size = 4
-input_data_shape =(5,224, 224, 3)
-directory = "../Data/input/"
 
-CLASS = ["None","fist", "one finger", "stick"]
-# MODEL_DIRECTORY = "models/"
+
+DATA_ROOT = "../Data/input/"
+# DATA_ROOT = "../Data/test_input/"
+
 MODEL_PATH = "models/C3M"
 CP_PATH = "checkpoints/C3M/C3M_cp.ckpt"
 CP_DIR = os.path.dirname(CP_PATH)
 
-
-
 class C3D:
-    def __init__(self,input = directory):
+    def __init__(self,input = DATA_ROOT):
         self.input = input
+        self.epoch_num = 1
+        self.output_size = 4
+        self.conv_kernel_shape = (3,3,3)
+        self.pool_kernel_shape1 = (1,2,2)
+        self.batch_size = 4
+        self.input_data_shape =(5,224, 224, 3)
+        self.targets = ["None","fist", "one finger", "stick"]
+        self.pool_kernel_shape2 = (2,2,2)
+        self.class_weight = {0: 1.,
+        1: 10.,
+        2: 10.,
+        3: 10.
+        }
+
     def getData(self):
         print("\n[C3D][getData] start...")
         batches = bg.generateBatches(directory = self.input)
         # batches = bg.generateBatch(filename = self.input, shape = (224, 224))
         data, labels = zip(*batches)
+        # classTotals = labels.sum(axis=0)        
         (trainX, testX, trainY, testY) = train_test_split(data, labels, test_size=0.25, random_state=42)
         trainX = np.array(trainX)
         trainY = np.array(trainY)
-
-        # check hit and not hit data distribution
-        # count = [0,0]
-        # for hit in trainY:
-        #     if hit:
-        #         count[0] += 1
-        #     else:
-        #         count[1] += 1
-        # print("[training]hit,not hit: ", count)
-        # count = [0,0]
-        # for hit in testY:
-        #     if hit:
-        #         count[0] += 1
-        #     else:
-        #         count[1] += 1
-        # print("[test]hit,not hit: ", count)
         testX = np.array(testX)
         testY = np.array(testY)
+
         trainY = keras.utils.to_categorical(trainY)
-        
         testY = keras.utils.to_categorical(testY)
-        for data in testY:
-            print(data)
+
+        # classTotals = trainY.sum(axis=0)
+        # self.classWeight = classTotals.max()
         print("\n[C3D][getData] end...")
+
         return (trainX, testX, trainY, testY)
     def train(self):
         print("[C3D][train] start")
@@ -77,16 +70,17 @@ class C3D:
 
         model = keras.Sequential(
             [
-                Conv3D(64,conv_kernel_shape, activation='relu', input_shape=input_data_shape),
-                MaxPooling3D(pool_size=pool_kernel_shape1, strides=None, padding="valid", data_format=None),
-                Conv3D(128,conv_kernel_shape, activation='relu'),
-                MaxPooling3D(pool_size=pool_kernel_shape1, strides=None, padding="valid", data_format=None),
+                Conv3D(64,self.conv_kernel_shape, activation='relu', input_shape=self.input_data_shape),
+                MaxPooling3D(pool_size=self.pool_kernel_shape1, strides=None, padding="valid", data_format=None),
+                Conv3D(128,self.conv_kernel_shape, activation='relu'),
+                MaxPooling3D(pool_size=self.pool_kernel_shape1, strides=None, padding="valid", data_format=None),
                 Flatten(),
                 Dense(64, activation="relu", name="fc_layer1"),
                 Dense(64, activation="relu", name="fc_layer2"),
-                Dense(output_size, activation="softmax", name="fc_layer3")
+                Dense(self.output_size, activation="softmax", name="fc_layer3")
             ]
         )
+        
         model.save(MODEL_PATH)
 
         model.compile('adam', loss='categorical_crossentropy')
@@ -97,10 +91,13 @@ class C3D:
       
 
         print("\n[C3D][train] training network...")
-        H = model.fit(trainX, trainY, validation_data=(testX, testY),batch_size=batch_size, epochs=epoch_num, verbose=1,callbacks=[es_callback,cp_callback])
-        predictions = model.predict(testX, batch_size=batch_size)
+        H = model.fit(trainX, trainY, validation_data=(testX, testY),
+            batch_size=self.batch_size, epochs=self.epoch_num,class_weight=self.class_weight,
+            verbose=1,callbacks=[es_callback,cp_callback])
+        
+        predictions = model.predict(testX, batch_size=self.batch_size)
         print("\n[C3D][train] evaluating network...")
-        print(classification_report(testY.argmax(axis=1),predictions.argmax(axis=1),target_names=CLASS))
+        print(classification_report(testY.argmax(axis=1),predictions.argmax(axis=1),target_names=self.targets))
         print("[C3D][train] end")
     
     def loadModel():
