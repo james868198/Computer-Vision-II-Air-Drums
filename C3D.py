@@ -5,7 +5,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 
 import numpy as np
-import batch_generate as bg
+from utils import batch_generate as bg
+
+
 import sys
 import os
 
@@ -20,8 +22,7 @@ pool_kernel_shape1 = (1,2,2)
 
 batch_size = 4
 input_data_shape =(5,224, 224, 3)
-directory = "../Data/test_input/"
-
+directory = "../Data/input/"
 
 CLASS = ["None","fist", "one finger", "stick"]
 # MODEL_DIRECTORY = "models/"
