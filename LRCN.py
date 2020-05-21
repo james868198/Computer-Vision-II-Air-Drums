@@ -9,6 +9,7 @@ from sklearn.metrics import classification_report
 from tensorflow.keras.utils import to_categorical
 import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 
 batches = bg.generateBatches(directory = "../Data/input/")
 data, labels = zip(*batches)
@@ -27,8 +28,8 @@ vgg = VGG16(
 )
 # do not train first layers, I want to only train
 # the 4 last layers (my own choice, up to you)
-for layer in vgg.layers[:-4]:
-    layer.trainable = False
+# for layer in vgg.layers[:-4]:
+#     layer.trainable = False
 # create a Sequential model
 model = Sequential()
 # add vgg model for 5 input images (keeping the right shape
@@ -45,7 +46,7 @@ model.add(
 model.add(LSTM(256, activation='relu', return_sequences=False))
 # finalize with standard Dense, Dropout...
 model.add(Dense(64, activation='relu'))
-model.add(Dropout(.5))
+# model.add(Dropout(.5))
 # model.add(Dense(3, activation='softmax'))
 model.add(Dense(2, activation='softmax'))
 model.compile('adam', loss='categorical_crossentropy')
