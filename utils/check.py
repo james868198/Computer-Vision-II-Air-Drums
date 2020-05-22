@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 def isDrum(frame):
     
@@ -18,7 +19,7 @@ def isDrum(frame):
     else:
         return 0
 
-def plotResult(self, data):
+def plotResult(data):
     (loss,val_loss,accuracy,val_accuracy) = data
     training_number = len(loss)
     # plot the training loss and accuracy
