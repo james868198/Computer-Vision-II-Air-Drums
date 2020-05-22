@@ -18,7 +18,8 @@ def isDrum(frame):
     else:
         return 0
 
-def plotResult(self, (loss,val_loss,accuracy,val_accuracy)):
+def plotResult(self, data):
+    (loss,val_loss,accuracy,val_accuracy) = data
     training_number = len(loss)
     # plot the training loss and accuracy
     plt.style.use("ggplot")
@@ -32,5 +33,6 @@ def plotResult(self, (loss,val_loss,accuracy,val_accuracy)):
     plt.ylabel("Loss/Accuracy")
     plt.legend()
     plt.show()
+
 if __name__ == "__main__":
     print("run utils")
