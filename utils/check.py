@@ -1,3 +1,5 @@
+import matplotlib.pyplot as plt
+
 def isDrum(frame):
     
     def matchColor(pixel, color, thresh):
@@ -16,5 +18,19 @@ def isDrum(frame):
     else:
         return 0
 
+def plotResult(self, (loss,val_loss,accuracy,val_accuracy)):
+    training_number = len(loss)
+    # plot the training loss and accuracy
+    plt.style.use("ggplot")
+    plt.figure()
+    plt.plot(np.arange(0, training_number), loss, label="train_loss")
+    plt.plot(np.arange(0, training_number), val_loss, label="val_loss")
+    plt.plot(np.arange(0, training_number), accuracy, label="train_acc")
+    plt.plot(np.arange(0, training_number), val_accuracy, label="val_acc")
+    plt.title("Training Loss and Accuracy")
+    plt.xlabel("Epoch #")
+    plt.ylabel("Loss/Accuracy")
+    plt.legend()
+    plt.show()
 if __name__ == "__main__":
     print("run utils")

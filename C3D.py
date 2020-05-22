@@ -3,9 +3,11 @@ from tensorflow.keras.layers import Dense, Conv3D, Flatten, MaxPooling3D, Dropou
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
+import matplotlib.pyplot as plt
 
 import numpy as np
 from utils import batch_generate as bg
+from utils.check import plotResult
 
 
 import sys
@@ -65,7 +67,7 @@ class C3D:
     def train(self):
         print("[C3D][train] start")
 
-        # callbacks: early stop
+        # callbacks: early_stop, check_point
         es_callback = keras.callbacks.EarlyStopping(monitor='loss', patience=2)
         cp_callback = keras.callbacks.ModelCheckpoint(filepath=CP_PATH,save_weights_only=True,verbose=1)
 
@@ -81,10 +83,9 @@ class C3D:
                 Dense(self.output_size, activation="softmax", name="fc_layer3")
             ]
         )
-        
         model.save(MODEL_PATH)
-
-        model.compile('adam', loss='categorical_crossentropy')
+        model.compile('adam', loss='categorical_crossentropy',metrics=["accuracy"])
+       
         print(model.summary())
         # get data 
         (trainX, testX, trainY, testY) = self.getData()
@@ -100,6 +101,11 @@ class C3D:
         print("\n[C3D][train] evaluating network...")
         print(classification_report(testY.argmax(axis=1),predictions.argmax(axis=1),target_names=self.targets))
         print("[C3D][train] end")
+
+        (loss,val_loss,accuracy,val_accuracy) = (H.history["loss"],H.history["val_loss"],H.history["accuracy"],H.history["val_accuracy"])
+       
+        plotResult((loss,val_loss,accuracy,val_accuracy))
+
     
     def loadModel():
         print("[loadModel]")
