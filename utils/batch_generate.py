@@ -65,7 +65,7 @@ def generateBatch(directory,file, shape):
         # Capture frame-by-frame
         ret, frame = cap.read()
     
-        if frame is not None:
+        if ret:
             # print(str(count))
             if len(queue) == INPUT_FRAME_NUMBER:
                 queue.pop(0)
