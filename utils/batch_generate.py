@@ -12,6 +12,8 @@ INPUT_FILE_TYPE = {
 }
 INPUT_FRAME_NUMBER = 5
 
+TEST_ROOT = "../../Data/test/"
+
 def generateBatches(directory,shape = SHAPE):
     print("[generateBatchs]")
     entries = os.listdir(directory)
@@ -61,6 +63,8 @@ def generateBatch(directory,file, shape):
 
     queue = []
     count = 0
+    hit_count = 0 
+    non_hit_count = 0
     while(cap.isOpened()):
         # Capture frame-by-frame
         ret, frame = cap.read()
@@ -75,7 +79,17 @@ def generateBatch(directory,file, shape):
             queue.append(frame)
             batch = queue.copy()
             if len(batch) == INPUT_FRAME_NUMBER:
-                batches.append((batch, labels[count]))
+
+                # strict output number of data with label 0
+                if labels[count] == '0':
+                    if non_hit_count <= hit_count:
+                        batches.append((batch, labels[count]))
+                        non_hit_count += 1
+                else:
+                    batches.append((batch, labels[count]))
+                    hit_count += 1
+                # test save images
+               
             count += 1
         else:
             break
@@ -122,6 +136,28 @@ def printText(frame, text):
     out = cv2.putText(frame, text, org, font, fontScale, color, thickness, cv2.LINE_AA)
     
     return out   
+
+def generateDirs(class_num):
+    
+    for i in range(class_num):
+        dir_path = TEST_ROOTS + "d{}".format(i)
+        if not os.path.exists(dir_path):
+            try:
+                os.mkdir(dir_path)
+            except OSError:
+                print ("Creation of the directory %s failed" % dir_path)
+
+def saveBatch(type,seq):
+    dir_path = TEST_ROOT + "d{}/".format(type)+"d{}_{}".format(type,seq)
+    if not os.path.exists(dir_path):
+        try:
+            os.mkdir(dir_path)
+        except OSError:
+            print ("Creation of the directory %s failed" % dir_path)
+
+        for i in range(INPUT_FRAME_NUMBER):
+            filename = dir_path + "/d{}_{}_{}.jpg".format(type,seq,i)
+            cv2.imwrite(filename, batch[i])
 
 if __name__ == "__main__":
     
