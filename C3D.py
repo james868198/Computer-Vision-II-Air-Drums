@@ -104,7 +104,7 @@ class C3D:
 
         (loss,val_loss,accuracy,val_accuracy) = (H.history["loss"],H.history["val_loss"],H.history["accuracy"],H.history["val_accuracy"])
        
-        plotResult((loss,val_loss,accuracy,val_accuracy))
+        # plotResult((loss,val_loss,accuracy,val_accuracy))
 
     
     def loadModel():

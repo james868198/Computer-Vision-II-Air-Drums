@@ -36,4 +36,5 @@ def plotResult(data):
     plt.show()
 
 if __name__ == "__main__":
-    print("run utils")
+    pass
+    # print("run utils")
