@@ -89,7 +89,7 @@ def vertical_shift(img, ratio=0.0):
     img = fill(img, h, w)
     return img
 
-def increase_brightness(img, value=30):
+def increase_brightness(img, value=50):
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     h, s, v = cv2.split(hsv)
 

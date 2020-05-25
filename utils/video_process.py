@@ -11,13 +11,19 @@ ROOT =  "/Users/james/Pictures/opencv_test/record2/"
 OUTPUT_ROOT =  "/Users/james/Pictures/opencv_test/input3/"
 
 
-INPUT_DIRECTORY = "d2/"
-INPUT_FILE = "d_2_t.mp4"
+INPUT_DIRECTORY = "d0/"
+INPUT_FILE = "d_0_b.mp4"
 SIZE_H = 280 
 SIZE_W = 280 
 
 OFFSET = 50
-DIS_TO_CENTER = (200,-240) # for top
+# DIS_TO_CENTER = (200,-240) # for top r
+# DIS_TO_CENTER = (260,-340) # for top 
+# DIS_TO_CENTER = (320,-180) # for mid l
+# DIS_TO_CENTER = (240,-160) # for mid r
+# DIS_TO_CENTER = (280,80) # for bot l
+DIS_TO_CENTER = (180,80) # for bot r
+
 P_COPY_NUM = 5 # 0~4
 Filter_COPY_NUM = 4 #~0~4
 
@@ -61,23 +67,17 @@ def parseArgs():
                 SIZE_W = sys.argv[i]
             i+= 1
     # print(INPUT_FILE,OUTPUT_FILE,SIZE)
-def cropVideo(type = 0,filter = 0):
+def cropVideo(type = 0,filter = 0, replace = False):
     
     input_path = ROOT+INPUT_DIRECTORY+INPUT_FILE
-    cap = cv2.VideoCapture(input_path)
-
-    width = int(cap.get(3))
-    height = int(cap.get(4))
+   
     size_h = SIZE_H
     size_w = SIZE_W
     dis_to_center = getDis(DIS_TO_CENTER,OFFSET,type)
     dot_position = INPUT_FILE.rfind(".")
     print(dis_to_center)
-    fourcc = cv2.VideoWriter_fourcc(*'MPEG')
-    
-    fps = cap.get(cv2.CAP_PROP_FPS)
-    print("fps:",fps)
-
+   
+   
     filename = "{}{}_p{}_f{}.mp4".format(INPUT_FILE[:dot_position],OUTPUT_FILE,str(type),str(filter))
     output_path = "{}{}{}".format(OUTPUT_ROOT,INPUT_DIRECTORY,filename)
 
@@ -87,28 +87,54 @@ def cropVideo(type = 0,filter = 0):
     input_label_path = "{}.csv".format(input_path[:dot_position])
     output_label_path = "{}{}labels/{}".format(OUTPUT_ROOT,INPUT_DIRECTORY,output_labelname)
     
+    if os.path.exists(output_path) and not replace:
+        print("video already existed")
+        return
+    
+    cap = cv2.VideoCapture(input_path)
+    
+    width = int(cap.get(3))
+    height = int(cap.get(4))
+   
     # print(input_path)
     # print(output_path)
     # print(input_label_path)
     # print(output_label_path)
 
+    if OUTPUT_FILE == "_l":
+        start_point = (width//2-dis_to_center[0]-size_w, height//2+dis_to_center[1])
+        end_point = (start_point[0]+size_w,start_point[1]+size_h)
+    elif OUTPUT_FILE == "_r":
+        start_point = (width//2+dis_to_center[0], height//2+dis_to_center[1])
+        end_point = (start_point[0]+size_w,start_point[1]+size_h)
+    else:
+        print("?")
+
+    print(start_point,end_point)
+    if start_point[0]<0 or start_point[0]> width:
+        print("??")
+        return
+    if start_point[1]<0 or start_point[1]> height:
+        print("??")
+        return
+    if end_point[1]<0 or end_point[1]> width:
+        print("??")
+        return
+    if end_point[1]<0 or end_point[1]> height:
+        print("??")
+        return
+    
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    fourcc = cv2.VideoWriter_fourcc(*'MPEG')
     out = cv2.VideoWriter(output_path,fourcc, fps, (SIZE_W, SIZE_H))
     while True:
         ret, frame = cap.read()
         if not ret:
             break
-        # b1
-        if OUTPUT_FILE == "_l":
-            start_point = (width//2-dis_to_center[0]-size_w, height//2+dis_to_center[1])
-            end_point = (start_point[0]+size_w,start_point[1]+size_h)
-        elif OUTPUT_FILE == "_r":
-            start_point = (width//2+dis_to_center[0], height//2+dis_to_center[1])
-            end_point = (start_point[0]+size_w,start_point[1]+size_h)
-        else:
-            print("?")
         
         image = frame[start_point[1]:end_point[1],start_point[0]:end_point[0]]
         # cv2.imshow('Video', image)
+        # print(image)
         if (len(image[0]),len(image)) != (SIZE_W, SIZE_H):
             print("[error] wrong size")
             print(len(image),len(image[0]),len(image[0][0]), (SIZE_W, SIZE_H))
@@ -129,25 +155,38 @@ def cropVideo(type = 0,filter = 0):
 
 def showRec():
 
+  
+
+    input_path = ROOT+INPUT_DIRECTORY+INPUT_FILE
+    cap = cv2.VideoCapture(input_path)
     width = int(cap.get(3))
     height = int(cap.get(4))
     size_h = SIZE_H
     size_w = SIZE_W
     dis_to_center = DIS_TO_CENTER
-   
+    
+    if OUTPUT_FILE == "_l":
+        start_point = (width//2-dis_to_center[0]-size_w, height//2+dis_to_center[1])
+        end_point = (start_point[0]+size_w,start_point[1]+size_h)
+    elif OUTPUT_FILE == "_r":
+        start_point = (width//2+dis_to_center[0], height//2+dis_to_center[1])
+        end_point = (start_point[0]+size_w,start_point[1]+size_h)
+    else:
+        print("?")
+    print(start_point,end_point)
+    if start_point[0]<0 or start_point[0]> width:
+        return
+    if start_point[1]<0 or start_point[1]> height:
+        return
+    if end_point[1]<0 or end_point[1]> width:
+        return
+    if end_point[1]<0 or end_point[1]> height:
+        return
     while True:
         ret, frame = cap.read()
         if not ret:
             break
-        # b1
-        if OUTPUT_FILE == "_l":
-            start_point = (width//2-dis_to_center[0]-size_w, height//2+dis_to_center[1])
-            end_point = (start_point[0]+size_w,start_point[1]+size_h)
-        elif OUTPUT_FILE == "_r":
-            start_point = (width//2+dis_to_center[0], height//2+dis_to_center[1])
-            end_point = (start_point[0]+size_w,start_point[1]+size_h)
-        else:
-            print("?")
+       
         
         image = cv2.rectangle(frame, start_point, end_point, (0,255,0),3) 
 
@@ -206,6 +245,7 @@ def drawAllRec():
 def copyLabel(input_path,output_root):
     print("[generateDataWithAug]:",input_path,output_root)
     if not os.path.exists(input_path):
+        print("label exist")
         return
     shutil.copy2(input_path,output_root)
     print("Completed copying label: ",input_path)
@@ -236,6 +276,7 @@ def generateDataWithAug():
     for i in range(P_COPY_NUM):
         for j in range(Filter_COPY_NUM):
             cropVideo(i,j)
+        # cropVideo(i,3,replace = True)
 
 def runningScript():
     print("runningScript")
