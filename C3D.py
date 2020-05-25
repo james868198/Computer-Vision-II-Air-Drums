@@ -22,8 +22,8 @@ import os
 DATA_ROOT = "../Data/input/"
 # DATA_ROOT = "../Data/test_input/"
 
-MODEL_PATH = "models/C3M"
-CP_PATH = "checkpoints/C3M/C3M_cp.ckpt"
+MODEL_PATH = "models/C3D"
+CP_PATH = "checkpoints/C3D/C3D_cp.ckpt"
 CP_DIR = os.path.dirname(CP_PATH)
 
 class C3D:
