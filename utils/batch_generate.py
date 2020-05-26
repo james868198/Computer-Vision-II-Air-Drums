@@ -3,7 +3,7 @@ import cv2
 import time
 import os
 
-DATA_ROOT = "../../Data/test_input/"
+DATA_ROOT = "../../Data/input/"
 LABEL_ROOT = "labels/"
 SHAPE = (224, 224)
 INPUT_FILE_TYPE = {
@@ -59,14 +59,14 @@ def generateBatch(directory,file, shape, of = False):
         return 
     
     # start parsing
-    # print("[generateBatchs] start parsing")
+    print("[generateBatchs] start parsing")
     cap = cv2.VideoCapture(input_path)
 
     queue = []
     count = 0
     hit_count = 0 
     non_hit_count = 0
-    prev_frame = []
+    prev_frame = None
     while(cap.isOpened()):
         # Capture frame-by-frame
         ret, frame = cap.read()
@@ -80,7 +80,8 @@ def generateBatch(directory,file, shape, of = False):
                 frame = cv2.resize(frame, shape)
             
             if of:
-                if type(prev_frame) == 'NoneType':
+                if prev_frame is None:
+
                     count += 1
                     prev_frame = frame
                     continue
@@ -105,7 +106,7 @@ def generateBatch(directory,file, shape, of = False):
             count += 1
         else:
             break
-    # print("Sampled batches size:", len(batches))
+    print("Sampled batches size:", len(batches))
     # When everything done, release the capture
     cap.release()
     # cv2.destroyAllWindows()
@@ -172,20 +173,19 @@ def saveBatch(type,seq):
             cv2.imwrite(filename, batch[i])
 
 def opticalFlow(frame1,frame2):
-    try:
-        hsv = np.zeros_like(frame1)
-        hsv[...,1] = 255
-        prvs = cv2.cvtColor(frame1,cv2.COLOR_BGR2GRAY)
-        next = cv2.cvtColor(frame2,cv2.COLOR_BGR2GRAY)
-        flow = cv2.calcOpticalFlowFarneback(prvs,next, None, 0.5, 3, 15, 3, 5, 1.2, 0)
-        mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
-        hsv[...,0] = ang*180/np.pi/2
-        hsv[...,2] = cv2.normalize(mag,None,0,255,cv2.NORM_MINMAX)
-        bgr = cv2.cvtColor(hsv,cv2.COLOR_HSV2BGR)
-        return bgr
-    except:
-        print("opticalFlow exception occurred")
-        return 
+   
+    print(frame1)
+    hsv = np.zeros_like(frame1)
+    hsv[...,1] = 255
+    prvs = cv2.cvtColor(frame1,cv2.COLOR_BGR2GRAY)
+    next = cv2.cvtColor(frame2,cv2.COLOR_BGR2GRAY)
+    flow = cv2.calcOpticalFlowFarneback(prvs,next, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+    mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
+    hsv[...,0] = ang*180/np.pi/2
+    hsv[...,2] = cv2.normalize(mag,None,0,255,cv2.NORM_MINMAX)
+    bgr = cv2.cvtColor(hsv,cv2.COLOR_HSV2BGR)
+    return bgr
+   
 
 if __name__ == "__main__":
     
