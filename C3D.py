@@ -30,7 +30,7 @@ class C3D:
     def __init__(self,input = DATA_ROOT):
         self.input = input
         self.epoch_num = 100
-        self.output_size = 4
+        self.binary_output = False
         self.batch_size = 32
         self.conv_kernel_shape = (3,3,3)
         self.pool_kernel_shape1 = (1,2,2)
@@ -38,6 +38,8 @@ class C3D:
         self.targets = ["None","fist", "one finger", "stick"]
         self.pool_kernel_shape2 = (2,2,2)
         self.optical_flow = False
+        
+        self.output_size = 4
         self.class_weight = {0: 1.,
         1: 10.,
         2: 10.,
@@ -46,7 +48,7 @@ class C3D:
 
     def getData(self):
         print("\n[C3D][getData] start...")
-        batches = bg.generateBatches(directory = self.input, of = self.optical_flow)
+        batches = bg.generateBatches(directory = self.input, of = self.optical_flow, binary = self.binary_output)
         # batches = bg.generateBatch(filename = self.input, shape = (224, 224))
         data, labels = zip(*batches)
         # classTotals = labels.sum(axis=0)        

@@ -25,11 +25,12 @@ class LRCN():
     def __init__(self,input = DATA_ROOT):
         self.input = input
         self.epoch_num = 100
-        self.output_size = 4
         self.batch_size = 32
         self.optical_flow = False
         self.input_data_shape =(5,224, 224, 3)
         self.targets = ["None","fist", "one finger", "stick"]
+        self.output_size = 4
+        self.binary_output = False
         self.class_weight = {0: 1.,
         1: 10.,
         2: 10.,
@@ -38,7 +39,7 @@ class LRCN():
 
     def getData(self):
         print("\n[LRCN][getData] start...")
-        batches = bg.generateBatches(directory = self.input, of = self.optical_flow)
+        batches = bg.generateBatches(directory = self.input, of = self.optical_flow, binary = self.binary_output)
         # batches = bg.generateBatch(filename = self.input, shape = (224, 224))
         data, labels = zip(*batches)
         # classTotals = labels.sum(axis=0)        

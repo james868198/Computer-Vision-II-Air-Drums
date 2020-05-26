@@ -14,7 +14,7 @@ INPUT_FRAME_NUMBER = 5
 
 TEST_ROOT = "../../Data/test/"
 
-def generateBatches(directory,shape = SHAPE, of = False):
+def generateBatches(directory,shape = SHAPE, of = False, binary = False):
     print("[generateBatchs]")
     entries = os.listdir(directory)
     print(entries)
@@ -99,7 +99,10 @@ def generateBatch(directory,file, shape, of = False):
                         batches.append((batch, labels[count]))
                         non_hit_count += 1
                 else:
-                    batches.append((batch, labels[count]))
+                    if binary:
+                        batches.append((batch, '1'))
+                    else:
+                        batches.append((batch, labels[count]))
                     hit_count += 1
                 # test save images
                
