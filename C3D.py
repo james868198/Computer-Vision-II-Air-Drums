@@ -37,6 +37,7 @@ class C3D:
         self.input_data_shape =(5,224, 224, 3)
         self.targets = ["None","fist", "one finger", "stick"]
         self.pool_kernel_shape2 = (2,2,2)
+        self.optical_flow = False
         self.class_weight = {0: 1.,
         1: 10.,
         2: 10.,
@@ -45,7 +46,7 @@ class C3D:
 
     def getData(self):
         print("\n[C3D][getData] start...")
-        batches = bg.generateBatches(directory = self.input)
+        batches = bg.generateBatches(directory = self.input, of = self.optical_flow)
         # batches = bg.generateBatch(filename = self.input, shape = (224, 224))
         data, labels = zip(*batches)
         # classTotals = labels.sum(axis=0)        
@@ -124,7 +125,7 @@ class C3D:
         # print("Restored model, accuracy: {:5.2f}%".format(100*acc))
 
 if __name__ == "__main__":
-    print("Run CSD")
+    print("Run C3D")
     # model = C3D()
     
     # model.getData()
