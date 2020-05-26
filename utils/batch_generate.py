@@ -27,7 +27,7 @@ def generateBatches(directory,shape = SHAPE, of = False, binary = False):
     print("[generateBatchs] end, total:",len(batchs))
     return batchs
 
-def generateBatch(directory,file, shape, of = False):
+def generateBatch(directory,file, shape, of = False, binary = False):
 
     batches = []
     input_path = directory+file
