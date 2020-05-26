@@ -20,7 +20,7 @@ def generateBatches(directory,shape = SHAPE, of = False, binary = False):
     print(entries)
     batchs = []
     for file in entries:
-        data = generateBatch(directory,file,shape,of)
+        data = generateBatch(directory,file,shape,of,binary)
         if data == None:
             continue
         batchs.extend(data)
