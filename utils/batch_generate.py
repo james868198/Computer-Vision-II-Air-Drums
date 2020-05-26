@@ -172,9 +172,7 @@ def saveBatch(type,seq):
             filename = dir_path + "/d{}_{}_{}.jpg".format(type,seq,i)
             cv2.imwrite(filename, batch[i])
 
-def opticalFlow(frame1,frame2):
-   
-    print(frame1)
+def opticalFlow(frame1,frame2):   
     hsv = np.zeros_like(frame1)
     hsv[...,1] = 255
     prvs = cv2.cvtColor(frame1,cv2.COLOR_BGR2GRAY)
