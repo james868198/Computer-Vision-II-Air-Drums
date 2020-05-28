@@ -113,6 +113,8 @@ def getLabelFromVideo(filename,type):
     return labels
 
 if __name__ == "__main__":
-    test_directory = "/Users/james/Pictures/opencv_test/test_input/"
+
+    # test_directory = "/Users/james/Pictures/opencv_test/record3/"
     
-    generateLabelsByClass(test_directory)
+    # generateLabelsByClass(test_directory)
+    pass

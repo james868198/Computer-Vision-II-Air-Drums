@@ -14,20 +14,20 @@ INPUT_FRAME_NUMBER = 5
 
 TEST_ROOT = "../../Data/test/"
 
-def generateBatches(directory,shape = SHAPE, of = False, binary = False):
+def generateBatches(directory,shape = SHAPE, of = False, binary = False, frame_number = INPUT_FRAME_NUMBER):
     print("[generateBatchs]")
     entries = os.listdir(directory)
     print(entries)
     batchs = []
     for file in entries:
-        data = generateBatch(directory,file,shape,of,binary)
+        data = generateBatch(directory,file,shape,of,binary,frame_number)
         if data == None:
             continue
         batchs.extend(data)
     print("[generateBatchs] end, total:",len(batchs))
     return batchs
 
-def generateBatch(directory,file, shape, of = False, binary = False):
+def generateBatch(directory,file, shape, of, binary, frame_number):
 
     batches = []
     input_path = directory+file
@@ -67,13 +67,14 @@ def generateBatch(directory,file, shape, of = False, binary = False):
     hit_count = 0 
     non_hit_count = 0
     prev_frame = None
+    print(binary)
     while(cap.isOpened()):
         # Capture frame-by-frame
         ret, frame = cap.read()
        
         if ret:
             # print(str(count))
-            if len(queue) == INPUT_FRAME_NUMBER:
+            if len(queue) == frame_number:
                 queue.pop(0)
             # check = isDrum(frame)
             if shape is not None: 
