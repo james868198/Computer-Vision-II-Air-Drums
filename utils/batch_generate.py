@@ -68,6 +68,7 @@ def generateBatch(directory,file, shape, of, binary, frame_number):
     non_hit_count = 0
     prev_frame = None
     print(binary)
+    print(frame_number)
     while(cap.isOpened()):
         # Capture frame-by-frame
         ret, frame = cap.read()
@@ -92,8 +93,9 @@ def generateBatch(directory,file, shape, of, binary, frame_number):
 
             queue.append(frame)
             batch = queue.copy()
-            if len(batch) == INPUT_FRAME_NUMBER:
 
+            
+            if len(batch) == frame_number:
                 # strict output number of data with label 0
                 if labels[count] == '0':
                     if non_hit_count <= hit_count:
@@ -164,7 +166,7 @@ def generateDirs(class_num):
             except OSError:
                 print ("Creation of the directory %s failed" % dir_path)
 
-def saveBatch(type,seq):
+def saveBatch(type,seq, frame_number):
     dir_path = TEST_ROOT + "d{}/".format(type)+"d{}_{}".format(type,seq)
     if not os.path.exists(dir_path):
         try:
@@ -172,7 +174,7 @@ def saveBatch(type,seq):
         except OSError:
             print ("Creation of the directory %s failed" % dir_path)
 
-        for i in range(INPUT_FRAME_NUMBER):
+        for i in range(frame_number):
             filename = dir_path + "/d{}_{}_{}.jpg".format(type,seq,i)
             cv2.imwrite(filename, batch[i])
 
@@ -195,7 +197,7 @@ if __name__ == "__main__":
     # filename = "labeledvideo5.mp4"
 
     # ---- generate batchs ----
-    batches = generateBatches(DATA_ROOT, of = True)
+    batches = generateBatches(DATA_ROOT, of = True, frame_number = 7)
     # print("batches:",len(batches))
    
     # ---- plot batches ----
