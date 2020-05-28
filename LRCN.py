@@ -22,7 +22,7 @@ CP_PATH = "checkpoints/LRCN/LRCN_cp.ckpt"
 CP_DIR = os.path.dirname(CP_PATH)
 
 class LRCN():
-    def __init__(self,input = DATA_ROOT,frame_number):
+    def __init__(self,input = DATA_ROOT, frame_number = 5):
         self.input = input
         self.epoch_num = 100
         self.batch_size = 32
