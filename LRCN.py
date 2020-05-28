@@ -22,15 +22,16 @@ CP_PATH = "checkpoints/LRCN/LRCN_cp.ckpt"
 CP_DIR = os.path.dirname(CP_PATH)
 
 class LRCN():
-    def __init__(self,input = DATA_ROOT):
+    def __init__(self,input = DATA_ROOT,frame_number):
         self.input = input
         self.epoch_num = 100
         self.batch_size = 32
         self.optical_flow = False
-        self.input_data_shape =(5,224, 224, 3)
+        self.frame_number = frame_number
+        self.input_data_shape =(frame_number, 224, 224, 3)
         self.targets = ["None","fist", "one finger", "stick"]
         self.output_size = 4
-        self.frame_number = 5
+        
         self.binary_output = False
         self.class_weight = {0: 1.,
         1: 10.,

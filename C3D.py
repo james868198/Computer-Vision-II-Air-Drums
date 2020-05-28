@@ -27,18 +27,18 @@ CP_PATH = "checkpoints/C3D/C3D_cp.ckpt"
 CP_DIR = os.path.dirname(CP_PATH)
 
 class C3D:
-    def __init__(self,input = DATA_ROOT):
+    def __init__(self,input = DATA_ROOT, frame_number = 5):
         self.input = input
         self.epoch_num = 100
         self.binary_output = False
         self.batch_size = 32
         self.conv_kernel_shape = (3,3,3)
         self.pool_kernel_shape1 = (1,2,2)
-        self.input_data_shape =(5,224, 224, 3)
+        self.frame_number = frame_number
+        self.input_data_shape =(frame_number, 224, 224, 3)
         self.targets = ["None","fist", "one finger", "stick"]
         self.pool_kernel_shape2 = (2,2,2)
         self.optical_flow = False
-        self.frame_number = 5
         self.output_size = 4
         self.class_weight = {0: 1.,
         1: 10.,
