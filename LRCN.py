@@ -31,7 +31,7 @@ class LRCN():
         self.input_data_shape =(frame_number, 224, 224, 3)
         self.targets = ["None","fist", "one finger", "stick"]
         self.output_size = 4
-        
+        self.frame_number = False
         self.binary_output = False
         self.class_weight = {0: 1.,
         1: 10.,
@@ -41,7 +41,8 @@ class LRCN():
 
     def getData(self):
         print("\n[LRCN][getData] start...")
-        batches = bg.generateBatches(directory = self.input, of = self.optical_flow, binary = self.binary_output, frame_number = self.frame_number)
+        batches = bg.generateBatches(directory = self.input, of = self.optical_flow, binary = self.binary_output, 
+        frame_number = self.frame_number,labelBalance = self.frame_number)
         # batches = bg.generateBatch(filename = self.input, shape = (224, 224))
         data, labels = zip(*batches)
         # classTotals = labels.sum(axis=0)        
