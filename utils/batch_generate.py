@@ -14,20 +14,20 @@ INPUT_FRAME_NUMBER = 5
 
 TEST_ROOT = "../../Data/test/"
 
-def generateBatches(directory,shape = SHAPE, of = False, binary = False, frame_number = INPUT_FRAME_NUMBER):
+def generateBatches(directory,shape = SHAPE, of = False, binary = False, frame_number = INPUT_FRAME_NUMBER,labelBalance = True):
     print("[generateBatchs]")
     entries = os.listdir(directory)
     print(entries)
     batchs = []
     for file in entries:
-        data = generateBatch(directory,file,shape,of,binary,frame_number)
+        data = generateBatch(directory,file,shape,of,binary,frame_number,labelBalance)
         if data == None:
             continue
         batchs.extend(data)
     print("[generateBatchs] end, total:",len(batchs))
     return batchs
 
-def generateBatch(directory,file, shape, of, binary, frame_number):
+def generateBatch(directory,file, shape, of, binary, frame_number,labelBalance):
 
     batches = []
     input_path = directory+file
@@ -98,7 +98,11 @@ def generateBatch(directory,file, shape, of, binary, frame_number):
             if len(batch) == frame_number:
                 # strict output number of data with label 0
                 if labels[count] == '0':
-                    if non_hit_count <= hit_count:
+                    if labelBalance:
+                        if non_hit_count <= hit_count:
+                            batches.append((batch, labels[count]))
+                            non_hit_count += 1
+                    else:
                         batches.append((batch, labels[count]))
                         non_hit_count += 1
                 else:
@@ -197,7 +201,7 @@ if __name__ == "__main__":
     # filename = "labeledvideo5.mp4"
 
     # ---- generate batchs ----
-    batches = generateBatches(DATA_ROOT, of = True, frame_number = 7)
+    # batches = generateBatches(DATA_ROOT, of = True, frame_number = 7)
     # print("batches:",len(batches))
    
     # ---- plot batches ----
@@ -217,3 +221,4 @@ if __name__ == "__main__":
                 
     #     i += 1
     #     # time.sleep(1)
+    pass
