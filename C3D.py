@@ -39,7 +39,7 @@ class C3D:
         self.targets = ["None","fist", "one finger", "stick"]
         self.pool_kernel_shape2 = (2,2,2)
         self.optical_flow = False
-        self.frame_number = False
+        self.labelBalance = False
         self.output_size = 4
         self.class_weight = {0: 1.,
         1: 10.,
@@ -50,7 +50,7 @@ class C3D:
     def getData(self):
         print("\n[C3D][getData] start...")
         batches = bg.generateBatches(directory = self.input, of = self.optical_flow, binary = self.binary_output, 
-        frame_number = self.frame_number, labelBalance = self.frame_number)
+        frame_number = self.frame_number, labelBalance = self.labelBalance)
 
         # batches = bg.generateBatch(filename = self.input, shape = (224, 224))
         data, labels = zip(*batches)
