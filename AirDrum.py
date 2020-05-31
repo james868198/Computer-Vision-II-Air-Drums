@@ -1,15 +1,21 @@
 import cv2
 from tensorflow import keras
 from collections import deque
+from utils import batch_generate as bg
+
 import numpy as np
 
-INPUT_VIDEO = ""
-MODEL_PATH = "models/C3M"
-HIT_AREA_SIZE = 280
+INPUT_VIDEO = "../Data/demo/d2_demo.MOV"
+MODEL_PATH = "models/C3D"
+HIT_AREA_SIZE = 300
 MODE_INPUT_SIZE = 224
 INPUT_FRAME_NUMBER = 5
 MODEL = keras.models.load_model(MODEL_PATH)
 
+LEFT_REC_POSITION = (160,160)
+RIGHT_REC_POSITION = (820,160)
+
+SHAPE = (1280,720)
 
 def main(input_path = None):
     if input_path == None:
@@ -18,58 +24,56 @@ def main(input_path = None):
         cap = cv2.VideoCapture(input_path)
     width = int(cap.get(3))
     height = int(cap.get(4))
+    
+    print("video size:", width, height)
+    
     size_h = HIT_AREA_SIZE
     size_w = HIT_AREA_SIZE
-    queue_b_l = deque()
-
+    queue_l = deque()
+    queue_r = deque()
+    frame_number = INPUT_FRAME_NUMBER
+    prev_frame = None
+    
     while(cap.isOpened()):
         # Capture frame-by-frame
         ret, frame = cap.read()
         
         if ret:
-            
-            # b
-            dis_to_center = (280,80)
-            start_point = (width//2-dis_to_center[0]-size_w, height//2+dis_to_center[1])
-            end_point = (start_point[0]+size_w,start_point[1]+size_h)
-            cv2.rectangle(frame, start_point, end_point, (0,255,0),3)
+            frame = cv2.resize(frame, SHAPE)
+            # left
+            left_start_point = LEFT_REC_POSITION
+            left_end_point = (left_start_point[0]+size_w,left_start_point[1]+size_h)
+            cv2.rectangle(frame, left_start_point, left_end_point, (0,255,0),3)
 
-            b_l = frame[start_point[1]:end_point[1],start_point[0]:end_point[0]]
-            b_l = cv2.resize(b_l, (224,224))
-            # start_point2 = (width//2+dis_to_center[0], height//2+dis_to_center[1])
-            # end_point2 = (start_point2[0]+size_w,start_point2[1]+size_h)
-            # image = cv2.rectangle(frame, start_point2, end_point2, (0,255,0),3) 
+            left_image = frame[left_start_point[1]:left_end_point[1],left_start_point[0]:left_end_point[0]]
 
-            # # m
-            # dis_to_center = (300,-20)
-            # start_point1 = (width//2-dis_to_center[0]-size_w, height//2+dis_to_center[1]-size_h//2)
-            # end_point1 = (start_point1[0]+size_w,start_point1[1]+size_h)
-            # image = cv2.rectangle(frame, start_point1, end_point1, (0,255,0),3)
+            # right
+            right_start_point = RIGHT_REC_POSITION
+            right_end_point = (right_start_point[0]+size_w,right_start_point[1]+size_h)
+            cv2.rectangle(frame, right_start_point, right_end_point, (0,255,0),3)
 
-            # start_point2 = (width//2+dis_to_center[0], height//2+dis_to_center[1]-size_h//2)
-            # end_point2 = (start_point2[0]+size_w,start_point2[1]+size_h)
-            # image = cv2.rectangle(frame, start_point2, end_point2, (0,255,0),3) 
+            right_image = frame[right_start_point[1]:right_end_point[1],right_start_point[0]:right_end_point[0]]
 
-            # # t
+            if prev_frame is not None:
+                queue_l.append(bg.opticalFlow(prev_frame[0], left_image))
+                queue_r.append(bg.opticalFlow(prev_frame[1], right_image))
+            prev_frame = [left_image,right_image]
 
-            # dis_to_center = (220,-120)
-            # start_point1 = (width//2-dis_to_center[0]-size_w, height//2+dis_to_center[1]-size_h)
-            # end_point1 = (start_point1[0]+size_w,start_point1[1]+size_h)
-            # image = cv2.rectangle(frame, start_point1, end_point1, (0,255,0),3)
+            l_status = actionStatus(queue_l,frame_number)
+            r_status = actionStatus(queue_r,frame_number)
 
-            # start_point2 = (width//2+dis_to_center[0], height//2+dis_to_center[1]-size_h)
-            # end_point2 = (start_point2[0]+size_w,start_point2[1]+size_h)
-            # image = cv2.rectangle(frame, start_point2, end_point2, (0,255,0),3) 
-            # cv2.imshow('Video', image)
-            
-            
-            # status = actionStatus(queue_b_l,b_l)
-            # print(status)
+            if len(queue_l) >= frame_number:
+                queue_l.popleft()
+            if len(queue_r) >= frame_number:
+                queue_r.popleft()
+
+            print(l_status,r_status)
 
             # font = cv2.FONT_HERSHEY_SIMPLEX
 
-            # cv2.putText(frame,str(status),(10,30), font, 1,(2,255,255),3,cv2.LINE_AA)
-            cv2.imshow('Video', frame)
+            # cv2.putText(frame,"left:{},right:{}".format(str(l_status),str(r_status)),(10,30), font, 1,(2,255,255),3,cv2.LINE_AA)
+            
+            # cv2.imshow('Video', frame)
 
             if cv2.waitKey(1) == 27:
                 break
@@ -78,22 +82,18 @@ def main(input_path = None):
         
     cv2.destroyAllWindows()
     cap.release()
-    
-def actionStatus(queue,input_data):
+
+
+def actionStatus(queue,frame_number):
     status = 0
-    queue.append(input_data)
-    print(len(input_data))
-    if len(queue) > INPUT_FRAME_NUMBER:
-        queue.popleft()
-    if len(queue) == INPUT_FRAME_NUMBER:
-
+    if len(queue) >= frame_number:
         status = MODEL.predict_classes(np.array([queue]))
-
+        queue.popleft()
     return status
 
 if __name__ == "__main__":
     print("Run AirDrum")
-    main()
+    main(INPUT_VIDEO)
     # model = C3D()
     
     # model.getData()
