@@ -5,8 +5,8 @@ from utils import batch_generate as bg
 
 import numpy as np
 
-INPUT_VIDEO = "../Data/demo/d2_demo.MOV"
-OUTPUT_PATH = "../Data/demo/d2_demo_output.MOV"
+INPUT_VIDEO = "../Data/demo/d1_demo.MOV"
+OUTPUT_PATH = "../Data/demo/d1_demo_output.MOV"
 MODEL_PATH = "models/C3D"
 HIT_AREA_SIZE = 300
 MODE_INPUT_SIZE = (224,224)
@@ -100,10 +100,12 @@ def main(input_path = None,isOutput = EXPORT):
             count += 1
         else:
             break
-        
-    cv2.destroyAllWindows()
+    
     if isOutput:
         out.release()
+    else:
+        cv2.destroyAllWindows()
+        
     cap.release()
 
 

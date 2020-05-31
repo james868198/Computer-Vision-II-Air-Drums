@@ -3,25 +3,13 @@ from tensorflow.keras.layers import Dense, Conv3D, Flatten, MaxPooling3D, Dropou
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
-import matplotlib.pyplot as plt
-
 import numpy as np
 from utils import batch_generate as bg
 from utils.check import plotResult
-
-
 import sys
 import os
 
-# conv_num = 8
-# pool_num = 5
-# fc_num = 2
-
-
-
 DATA_ROOT = "../Data/input/"
-# DATA_ROOT = "../Data/test_input/"
-
 MODEL_PATH = "models/C3D"
 CP_PATH = "checkpoints/C3D/C3D_cp.ckpt"
 CP_DIR = os.path.dirname(CP_PATH)

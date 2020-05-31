@@ -6,9 +6,7 @@ from tensorflow.keras.applications.vgg16 import VGG16
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from tensorflow.keras.utils import to_categorical
-import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib.pyplot as plt
 import sys
 import os
 
@@ -16,7 +14,6 @@ from utils import batch_generate as bg
 from utils.check import plotResult
 
 DATA_ROOT = "../Data/input/"
-
 MODEL_PATH = "models/LRCN"
 CP_PATH = "checkpoints/LRCN/LRCN_cp.ckpt"
 CP_DIR = os.path.dirname(CP_PATH)
