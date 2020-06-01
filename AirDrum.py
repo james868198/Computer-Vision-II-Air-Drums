@@ -11,7 +11,6 @@ MODEL_PATH = "models/LRCN"
 HIT_AREA_SIZE = 300
 MODE_INPUT_SIZE = (224,224)
 INPUT_FRAME_NUMBER = 5
-MODEL = keras.models.load_model(MODEL_PATH)
 
 LEFT_REC_POSITION = (160,160)
 RIGHT_REC_POSITION = (820,160)
@@ -22,7 +21,7 @@ SHAPE = (1280,720)
 COLOR = [(255,0,0),(0,255,0)] #0:no hit, 1:hit
 EXPORT = True
 
-def main(input_path = None,output_path = None, isOutput = EXPORT):
+def main(input_path = None,output_path = None,model_path isOutput = EXPORT):
     if input_path == None:
         cap = cv2.VideoCapture(0)
     else:
@@ -51,6 +50,8 @@ def main(input_path = None,output_path = None, isOutput = EXPORT):
         fourcc = cv2.VideoWriter_fourcc(*'MPEG')
         out = cv2.VideoWriter(output_path,fourcc, fps, SHAPE)
     
+    model = keras.models.load_model(model_path)
+
     while(cap.isOpened()):
         # Capture frame-by-frame
         ret, frame = cap.read()
@@ -80,8 +81,8 @@ def main(input_path = None,output_path = None, isOutput = EXPORT):
                 queue_r.append(bg.opticalFlow(prev_frame[1], right_image))
             prev_frame = [left_image,right_image]
 
-            l_status = actionStatus(queue_l,frame_number)
-            r_status = actionStatus(queue_r,frame_number)
+            l_status = actionStatus(model,queue_l,frame_number)
+            r_status = actionStatus(model,queue_r,frame_number)
 
             print(count,l_status,r_status)
 
@@ -109,7 +110,7 @@ def main(input_path = None,output_path = None, isOutput = EXPORT):
     cap.release()
 
 
-def playCroppedVideo(input_path,output_path):
+def playCroppedVideo(input_path,output_path,model_path):
     if input_path is None:
         return
     cap = cv2.VideoCapture(input_path)
@@ -135,6 +136,7 @@ def playCroppedVideo(input_path,output_path):
     fourcc = cv2.VideoWriter_fourcc(*'MPEG')
     out = cv2.VideoWriter(output_path,fourcc, fps, (width,height))
 
+    model = keras.models.load_model(model_path)
     while(cap.isOpened()):
         # Capture frame-by-frame
         ret, frame = cap.read()
@@ -147,7 +149,7 @@ def playCroppedVideo(input_path,output_path):
                 queue.append(bg.opticalFlow(prev_frame, framse_resized))
             prev_frame = framse_resized
 
-            status = actionStatus(queue,frame_number)
+            status = actionStatus(model,queue,frame_number)
             
             print(count,status)
 
@@ -166,17 +168,17 @@ def playCroppedVideo(input_path,output_path):
     out.release()
     cap.release()
 
-def actionStatus(queue,frame_number):
+def actionStatus(model,queue,frame_number):
     status = 0
     if len(queue) >= frame_number:
-        status = MODEL.predict_classes(np.array([queue]))
+        status = model.predict_classes(np.array([queue]))
         queue.popleft()
     return status
 
 if __name__ == "__main__":
     print("Run AirDrum")
-    # main(INPUT_VIDEO,OUTPUT_PATH)
-    # playCroppedVideo(INPUT_VIDEO,OUTPUT_PATH)
+    # main(INPUT_VIDEO,OUTPUT_PATH,MODEL_PATH)
+    # playCroppedVideo(INPUT_VIDEO,OUTPUT_PATH,MODEL_PATH)
     # model = C3D()
     
     # model.getData()
