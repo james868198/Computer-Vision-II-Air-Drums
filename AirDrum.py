@@ -21,7 +21,7 @@ SHAPE = (1280,720)
 COLOR = [(255,0,0),(0,255,0)] #0:no hit, 1:hit
 EXPORT = True
 
-def main(input_path = None,output_path = None,model_path isOutput = EXPORT):
+def main(input_path,output_path,model_path, isOutput = EXPORT):
     if input_path == None:
         cap = cv2.VideoCapture(0)
     else:
