@@ -47,7 +47,5 @@ class C3D(modelFramewrok):
 if __name__ == "__main__":
     print("Run C3D")
     # model = C3D(input=DATA_ROOT,frame_number = 5,model_path = MODEL_PATH,checkpoint_path = CP_PATH)
-    # model.getData()
-    
-    # model.getData()
+    # model.getData()    
     pass

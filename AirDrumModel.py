@@ -29,18 +29,23 @@ class modelFramewrok():
         self.binary_output = True
         self.model_path = model_path
         self.targets = ["not hit","hit"]
-        self.input_data_shape =(frame_number, 224, 224, 3)
+        self.shape = (224,224)
+        self.input_data_shape =(5, 224,224, 3)
         self.cp_path = checkpoint_path
      
         # self.class_weight = {0: 1.,
         #     1: 3.
         # }
+    def updateInputShape(shape = self.shape, frame_number = self.frame_number):
+        self.frame_number = frame_number
+        self.shape = shape
+        self.input_data_shape =(frame_number, self.shape[0], self.shape[1], 3)
     
     def getData(self):
         print("[getData] start")
-        batches = bg.generateBatches(directory = self.input, of = self.optical_flow, binary = self.binary_output, 
+        batches = bg.generateBatches(directory = self.input, shape = self.shape, of = self.optical_flow, binary = self.binary_output, 
         frame_number = self.frame_number,labelBalance = self.labelBalance)
-        # batches = bg.generateBatch(filename = self.input, shape = (224, 224))
+        # batches = bg.generateBatch(filename = self.input, shape = self.shape)
         data, labels = zip(*batches)
         # classTotals = labels.sum(axis=0)        
         (trainX, testX, trainY, testY) = train_test_split(data, labels, test_size=0.25, random_state=42)
@@ -72,7 +77,7 @@ class modelFramewrok():
         print("frame_number:",  self.frame_number)
         print("label balance:",  self.labelBalance)
         print("\n")
-        
+
         #get model
         if self.model_path is None:
             print("[train] doesn't get model from path:", self.model_path)
@@ -115,8 +120,8 @@ class modelFramewrok():
         print(classification_report(testY.argmax(axis=1),predictions.argmax(axis=1),target_names=self.targets))
         print("[train] end")
     
-    def test(self,input_path):
-        batches = generateBatch(input_path,file_name,(224, 224),self.optical_flow,self.binary_output,5,self.labelBalance)
+    def test(self,input_path,file_name):
+        batches = generateBatch(input_path,file_name, shape = self.shape, self.optical_flow,self.binary_output,5,self.labelBalance)
         input_data, output_data = zip(*batches)
         i = np.array(input_data)
         o = np.array(output_data) 
