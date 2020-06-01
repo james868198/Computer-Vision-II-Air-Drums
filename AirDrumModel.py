@@ -36,10 +36,14 @@ class modelFramewrok():
         # self.class_weight = {0: 1.,
         #     1: 3.
         # }
-    def updateInputShape(shape = self.shape, frame_number = self.frame_number):
-        self.frame_number = frame_number
+    def updateShape(self, shape):
         self.shape = shape
-        self.input_data_shape =(frame_number, self.shape[0], self.shape[1], 3)
+        self.input_data_shape[1] = shape[0]
+        self.input_data_shape[2] = shape[1]
+    
+    def updateFrameNumber(self, frame_number):
+        self.frame_number = frame_number
+        self.input_data_shape[0] = frame_number
     
     def getData(self):
         print("[getData] start")
@@ -121,7 +125,7 @@ class modelFramewrok():
         print("[train] end")
     
     def test(self,input_path,file_name):
-        batches = generateBatch(input_path,file_name, shape = self.shape, self.optical_flow,self.binary_output,5,self.labelBalance)
+        batches = generateBatch(input_path,file_name, self.shape, self.optical_flow,self.binary_output,5,self.labelBalance)
         input_data, output_data = zip(*batches)
         i = np.array(input_data)
         o = np.array(output_data) 
