@@ -120,7 +120,7 @@ def generateBatch(directory,file, shape, of, binary, frame_number,labelBalance):
 
                     if labelBalance:
                         select_count = random.randint(0,hit_interval)
-                        print(select_count)
+                        # print(select_count)
                 # test save images
                
             count += 1
