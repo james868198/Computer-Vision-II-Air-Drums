@@ -52,5 +52,5 @@ if __name__ == "__main__":
     print("Run LRCN")
     # model = LRCN(input=DATA_ROOT,frame_number = 5,model_path = MODEL_PATH,checkpoint_path = CP_PATH)
     # model.build()
-    # pass
+    pass
 
