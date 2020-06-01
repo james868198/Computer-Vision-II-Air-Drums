@@ -12,7 +12,7 @@ def isDrum(frame):
             return 0
 
     # print(frame[0,0],frame[-1,0],frame[0,-1],frame[-1,-1])
-    threash = 40
+    threash = 20
     
     if matchColor(frame[0][0], [0,0,0], threash) or matchColor(frame[0][-1], [0,0,255], threash) or matchColor(frame[-1][0], [255,0,0], threash) or matchColor(frame[-1][-1], [0,255,0], threash):
         return 1

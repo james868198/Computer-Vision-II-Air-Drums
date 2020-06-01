@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import time
 import os
+import random
 
 DATA_ROOT = "../../Data/input/"
 LABEL_ROOT = "labels/"
@@ -12,7 +13,7 @@ INPUT_FILE_TYPE = {
 }
 INPUT_FRAME_NUMBER = 5
 
-TEST_ROOT = "../../Data/testing/"
+TEST_ROOT = "../../Data/test_input/"
 ISTEST = True
 
 def generateBatches(directory,shape = SHAPE, of = False, binary = False, frame_number = INPUT_FRAME_NUMBER,labelBalance = True):
@@ -66,6 +67,10 @@ def generateBatch(directory,file, shape, of, binary, frame_number,labelBalance):
     count = 0
     hit_count = 0 
     non_hit_count = 0
+
+    select_count = -1
+    hit_interval = frame_number - 1
+
     prev_frame = None
     while(cap.isOpened()):
         # Capture frame-by-frame
@@ -92,14 +97,17 @@ def generateBatch(directory,file, shape, of, binary, frame_number,labelBalance):
             queue.append(frame)
             batch = queue.copy()
 
-            
             if len(batch) == frame_number:
                 # strict output number of data with label 0
                 if labels[count] == '0':
                     if labelBalance:
-                        if non_hit_count <= hit_count:
+                        if select_count == 0:
                             batches.append((batch, labels[count]))
                             non_hit_count += 1
+                            select_count -= 1
+                        elif select_count > 0:
+                            select_count -= 1
+
                     else:
                         batches.append((batch, labels[count]))
                         non_hit_count += 1
@@ -109,12 +117,17 @@ def generateBatch(directory,file, shape, of, binary, frame_number,labelBalance):
                     else:
                         batches.append((batch, labels[count]))
                     hit_count += 1
+
+                    if labelBalance:
+                        select_count = random.randint(0,hit_interval)
+                        print(select_count)
                 # test save images
                
             count += 1
         else:
             break
     print("[generateBatch] Sampled batches size:", len(batches))
+    print("[generateBatch] hit and not hit:",hit_count, non_hit_count)
     # When everything done, release the capture
     cap.release()
     # cv2.destroyAllWindows()
@@ -271,6 +284,8 @@ if __name__ == "__main__":
     # filename = "labeledvideo5.mp4"
 
     # ---- generate batchs ----
-    batches = generateBatchWithoutLabel(TEST_ROOT, "d2_1_r0_c0.mp4",SHAPE,True,True, 5, False)
+    # batches = generateBatchWithoutLabel(TEST_ROOT, "d2_1_r0_c0.mp4",SHAPE,True,True, 5, False)
+    batches = generateBatch(TEST_ROOT, "d2_2_r0_c0.mp4",SHAPE,True,True, 5, False)
+
     # print("batches:",len(batches))
     pass

@@ -39,8 +39,8 @@ fgbg = cv2.createBackgroundSubtractorMOG2()
 # --------------- FOR CROP VIDEO 2
 
 INPUT_ROOT2 = "/Users/james/Pictures/opencv_test/record3/d2"
-INPUT_FILE_Name2 = "d2_2.mp4"
-OUTPUT_ROOT2 =  "/Users/james/Pictures/opencv_test/record3/output_d2"
+INPUT_FILE_Name2 = "d2_1.mp4"
+OUTPUT_ROOT2 =  "/Users/james/Pictures/opencv_test/record3/output_d2_1"
 
 ROTATIONS = [0,10,30,-10,-30]
 COLOR_LEVEL = [(1,0),(0.5,40),(0.67,-20),(1.6,10),(1.8,30)]
@@ -336,8 +336,6 @@ def getDis(position,offset,type):
         return (position[0]-offset,position[1]-offset) # for 1
     else:
         return position
-
-    
 
 def applyFilter(type,frame, angle = 0, parameterForlEVEL = (1,0)):
     if type == 1:
