@@ -1,125 +1,53 @@
 from tensorflow import keras
 from tensorflow.keras.layers import Dense, Conv3D, Flatten, MaxPooling3D, Dropout,Activation
-from tensorflow.keras.utils import to_categorical
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
-import numpy as np
-from utils import batch_generate as bg
-from utils.check import plotResult
-import sys
-import os
+from tensorflow.keras import Sequential
+from tensorflow.keras.applications.vgg16 import VGG16
+
+from AirDrumModel import modelFramewrok
 
 DATA_ROOT = "../Data/input/"
 MODEL_PATH = "models/C3D"
 CP_PATH = "checkpoints/C3D/C3D_cp.ckpt"
-CP_DIR = os.path.dirname(CP_PATH)
 
-class C3D:
-    def __init__(self,input = DATA_ROOT, frame_number = 5):
-        self.input = input
-        self.epoch_num = 100
-        self.binary_output = False
-        self.batch_size = 32
-        self.conv_kernel_shape = (3,3,3)
-        self.pool_kernel_shape1 = (1,2,2)
-        self.frame_number = frame_number
-        self.input_data_shape =(frame_number, 224, 224, 3)
-        self.targets = ["None","fist", "one finger", "stick"]
-        self.pool_kernel_shape2 = (2,2,2)
-        self.optical_flow = False
-        self.labelBalance = False
-        self.output_size = 4
-        self.class_weight = {0: 1.,
-        1: 10.,
-        2: 10.,
-        3: 10.
-        }
+class C3D(modelFramewrok):
+    def build(self):
+        print("[build] start")
 
-    def getData(self):
-        print("\n[C3D][getData] start...")
-        batches = bg.generateBatches(directory = self.input, of = self.optical_flow, binary = self.binary_output, 
-        frame_number = self.frame_number, labelBalance = self.labelBalance)
-
-        # batches = bg.generateBatch(filename = self.input, shape = (224, 224))
-        data, labels = zip(*batches)
-        # classTotals = labels.sum(axis=0)        
-        (trainX, testX, trainY, testY) = train_test_split(data, labels, test_size=0.25, random_state=42)
-        trainX = np.array(trainX)
-        trainY = np.array(trainY)
-        testX = np.array(testX)
-        testY = np.array(testY)
-        testY = np.array(testY)
-
-        trainY = keras.utils.to_categorical(trainY)
-        testY = keras.utils.to_categorical(testY)
-
-        # classTotals = trainY.sum(axis=0)
-        # self.classWeight = classTotals.max()
-        print("\n[C3D][getData] end...")
-
-        return (trainX, testX, trainY, testY)
-    def train(self):
-        print("[C3D][train] start")
-
-        # callbacks: early_stop, check_point
-        es_callback = keras.callbacks.EarlyStopping(monitor='loss', patience=2)
-        cp_callback = keras.callbacks.ModelCheckpoint(filepath=CP_PATH,save_weights_only=True,verbose=1)
-
+        # validation
+        if len(self.targets) <= 1:
+            print("[error]")
+            return
+        output_size = len(self.targets)
+        conv_kernel_shape = (2,3,3)
+        pool_kernel_shape = (1,2,2)
+        
         model = keras.Sequential(
             [
-                Conv3D(64,self.conv_kernel_shape, activation='relu', input_shape=self.input_data_shape),
-                MaxPooling3D(pool_size=self.pool_kernel_shape1, strides=None, padding="valid", data_format=None),
-                Conv3D(128,self.conv_kernel_shape, activation='relu'),
-                MaxPooling3D(pool_size=self.pool_kernel_shape1, strides=None, padding="valid", data_format=None),
+                Conv3D(64,conv_kernel_shape, activation='relu', input_shape=self.input_data_shape),
+                MaxPooling3D(pool_size=pool_kernel_shape, strides=None, padding="valid", data_format=None),
+                Conv3D(128,conv_kernel_shape, activation='relu'),
+                MaxPooling3D(pool_size=pool_kernel_shape, strides=None, padding="valid", data_format=None),
+                Conv3D(256,conv_kernel_shape, activation='relu'),
+                Conv3D(256,conv_kernel_shape, activation='relu'),
+                MaxPooling3D(pool_size=pool_kernel_shape, strides=None, padding="valid", data_format=None),
                 Flatten(),
-                Dense(64, activation="relu", name="fc_layer1"),
-                Dense(64, activation="relu", name="fc_layer2"),
-                Dense(self.output_size, activation="softmax", name="fc_layer3")
+                Dense(512, activation="relu", name="fc_layer1"),
+                Dropout(.5),
+                Dense(512, activation="relu", name="fc_layer2"),
+                Dense(output_size, activation="softmax", name="fc_layer3")
             ]
         )
-        model.save(MODEL_PATH)
         model.compile('adam', loss='categorical_crossentropy',metrics=["accuracy"])
        
         print(model.summary())
-        # get data 
-        (trainX, testX, trainY, testY) = self.getData()
-        # model.save_weights(checkpoint_path.format(epoch=0))
-      
+        model.save(self.model_path)
 
-        print("\n[C3D][train] training network...")
-        H = model.fit(trainX, trainY, validation_data=(testX, testY),
-            batch_size=self.batch_size, epochs=self.epoch_num,class_weight=self.class_weight,
-            verbose=1,callbacks=[es_callback,cp_callback])
-        
-        predictions = model.predict(testX, batch_size=self.batch_size)
-        print("\n[C3D][train] evaluating network...")
-        print(classification_report(testY.argmax(axis=1),predictions.argmax(axis=1),target_names=self.targets))
-        print("[C3D][train] end")
-
-        (loss,val_loss,accuracy,val_accuracy) = (H.history["loss"],H.history["val_loss"],H.history["accuracy"],H.history["val_accuracy"])
-       
-        # plotResult((loss,val_loss,accuracy,val_accuracy))
-
-    
-    def loadModel():
-        print("[loadModel]")
-
-        # new_model = tf.keras.models.load_model('saved_model/my_model')
-
-        # cp = tf.train.latest_checkpoint(CP_DIR)
-        # # Create a new model instance
-        # model = create_model()
-
-        # # Load the previously saved weights
-        # model.load_weights(cp)
-
-        # # Re-evaluate the model
-        # loss, acc = model.evaluate(test_images,  test_labels, verbose=2)
-        # print("Restored model, accuracy: {:5.2f}%".format(100*acc))
+        print("[build] end")
 
 if __name__ == "__main__":
     print("Run C3D")
-    # model = C3D()
+    model = C3D(input=DATA_ROOT,frame_number = 5,model_path = MODEL_PATH,checkpoint_path = CP_PATH)
+    model.getData()
     
     # model.getData()
-    # model.train()
+    # pass

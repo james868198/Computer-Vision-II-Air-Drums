@@ -59,6 +59,99 @@ def generateBatch(directory,file, shape, of, binary, frame_number,labelBalance):
         return 
     
     # start parsing
+    print("[generateBatch] start parsing. file:{}, binary_label: {}, frames_num: {},optical flow: {} ".format(file,binary,frame_number, of))
+    cap = cv2.VideoCapture(input_path)
+    queue = []
+    count = 0
+    hit_count = 0 
+    non_hit_count = 0
+    prev_frame = None
+    while(cap.isOpened()):
+        # Capture frame-by-frame
+        ret, frame = cap.read()
+       
+        if ret:
+            # print(str(count))
+            if len(queue) == frame_number:
+                queue.pop(0)
+            # check = isDrum(frame)
+            if shape is not None: 
+                frame = cv2.resize(frame, shape)
+            
+            if of:
+                if prev_frame is None:
+
+                    count += 1
+                    prev_frame = frame
+                    continue
+                of_frame = opticalFlow(prev_frame, frame)
+                prev_frame = frame
+                frame = of_frame
+
+            queue.append(frame)
+            batch = queue.copy()
+
+            
+            if len(batch) == frame_number:
+                # strict output number of data with label 0
+                if labels[count] == '0':
+                    if labelBalance:
+                        if non_hit_count <= hit_count:
+                            batches.append((batch, labels[count]))
+                            non_hit_count += 1
+                    else:
+                        batches.append((batch, labels[count]))
+                        non_hit_count += 1
+                else:
+                    if binary:
+                        batches.append((batch, '1'))
+                    else:
+                        batches.append((batch, labels[count]))
+                    hit_count += 1
+                # test save images
+               
+            count += 1
+        else:
+            break
+    print("[generateBatch] Sampled batches size:", len(batches))
+    # When everything done, release the capture
+    cap.release()
+    # cv2.destroyAllWindows()
+    # print("count: ", len(batches))
+    return batches
+
+def generateBatchWithoutLabel(directory,file, shape, of, binary, frame_number,labelBalance):
+
+    batches = []
+    input_path = directory+file
+
+    # validate input file
+    if input_path == None or input_path == "":
+        return 
+    if not os.path.exists(input_path):
+        return 
+    dot_position = file.rfind(".")
+
+    if dot_position <0:
+        return 
+    if file[dot_position+1:] not in INPUT_FILE_TYPE:
+        return 
+    
+    label_path = directory+LABEL_ROOT+file[:dot_position]+".csv"
+    
+    # get labels
+    if not os.path.exists(label_path):
+        print("[error] get no label:", label_path,shape)
+        return 
+    
+    labels = None
+    with open(label_path, "r") as file_data:
+        labels = file_data.read().split(',')
+    
+    if labels == None or len(labels) == 0:
+        return 
+    
+    # start parsing
     print("[generateBatchs] start parsing")
     cap = cv2.VideoCapture(input_path)
 
@@ -204,21 +297,4 @@ if __name__ == "__main__":
     # batches = generateBatches(DATA_ROOT, of = True, frame_number = 7)
     # print("batches:",len(batches))
    
-    # ---- plot batches ----
-    # i = 1
-    # for batch, hit in batches:
-    #     # if hit is True:
-    #         # print(count, hit, len(batch))
-    #     for frame in batch:
-    #         if isDrum(frame) is True:
-    #             # printText(frame, "hit")
-    #             img = printText(frame, str(i) + ". hit")
-    #         else:
-    #             img = printText(frame, str(i) + ".")
-    #         cv2.imshow('Batch',img)
-    #         if cv2.waitKey(1) & 0xFF == ord('q'):
-    #             break
-                
-    #     i += 1
-    #     # time.sleep(1)
     pass
