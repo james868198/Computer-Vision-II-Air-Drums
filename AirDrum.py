@@ -5,9 +5,9 @@ from utils import batch_generate as bg
 
 import numpy as np
 
-INPUT_VIDEO = "../Data/demo/d1_demo.MOV"
-OUTPUT_PATH = "../Data/demo/d1_demo_output.MOV"
-MODEL_PATH = "models/C3D"
+INPUT_VIDEO = "../Data/demo/d2_demo.MOV"
+OUTPUT_PATH = "../Data/demo/d2_demo_output_LRCN.MOV"
+MODEL_PATH = "models/LRCN"
 HIT_AREA_SIZE = 300
 MODE_INPUT_SIZE = (224,224)
 INPUT_FRAME_NUMBER = 5
@@ -22,7 +22,7 @@ SHAPE = (1280,720)
 COLOR = [(255,0,0),(0,255,0)] #0:no hit, 1:hit
 EXPORT = True
 
-def main(input_path = None,isOutput = EXPORT):
+def main(input_path = None,output_path = None, isOutput = EXPORT):
     if input_path == None:
         cap = cv2.VideoCapture(0)
     else:
@@ -45,11 +45,11 @@ def main(input_path = None,isOutput = EXPORT):
     r_status = 0
     count = 0
     if isOutput:
-        if OUTPUT_PATH is None:
+        if output_path is None:
             return
         fps = cap.get(cv2.CAP_PROP_FPS)
         fourcc = cv2.VideoWriter_fourcc(*'MPEG')
-        out = cv2.VideoWriter(OUTPUT_PATH,fourcc, fps, SHAPE)
+        out = cv2.VideoWriter(output_path,fourcc, fps, SHAPE)
     
     while(cap.isOpened()):
         # Capture frame-by-frame
@@ -105,7 +105,7 @@ def main(input_path = None,isOutput = EXPORT):
         out.release()
     else:
         cv2.destroyAllWindows()
-        
+
     cap.release()
 
 
@@ -175,7 +175,7 @@ def actionStatus(queue,frame_number):
 
 if __name__ == "__main__":
     print("Run AirDrum")
-    main(INPUT_VIDEO)
+    # main(INPUT_VIDEO,OUTPUT_PATH)
     # playCroppedVideo(INPUT_VIDEO,OUTPUT_PATH)
     # model = C3D()
     

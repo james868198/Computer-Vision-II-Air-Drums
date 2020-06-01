@@ -33,7 +33,7 @@ def rotation_90_clockwise(img):
 
 def rotation(img,angle):
     return imutils.rotate(img, angle)
-    r
+    
 def blurring(img):
     return cv2.GaussianBlur(img, (11,11),0)
 

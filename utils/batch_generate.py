@@ -12,7 +12,8 @@ INPUT_FILE_TYPE = {
 }
 INPUT_FRAME_NUMBER = 5
 
-TEST_ROOT = "../../Data/test/"
+TEST_ROOT = "../../Data/testing/"
+ISTEST = True
 
 def generateBatches(directory,shape = SHAPE, of = False, binary = False, frame_number = INPUT_FRAME_NUMBER,labelBalance = True):
     print("[generateBatchs]")
@@ -137,28 +138,13 @@ def generateBatchWithoutLabel(directory,file, shape, of, binary, frame_number,la
     if file[dot_position+1:] not in INPUT_FILE_TYPE:
         return 
     
-    label_path = directory+LABEL_ROOT+file[:dot_position]+".csv"
-    
-    # get labels
-    if not os.path.exists(label_path):
-        print("[error] get no label:", label_path,shape)
-        return 
-    
-    labels = None
-    with open(label_path, "r") as file_data:
-        labels = file_data.read().split(',')
-    
-    if labels == None or len(labels) == 0:
-        return 
-    
     # start parsing
     print("[generateBatchs] start parsing")
     cap = cv2.VideoCapture(input_path)
 
     queue = []
     count = 0
-    hit_count = 0 
-    non_hit_count = 0
+
     prev_frame = None
     print(binary)
     print(frame_number)
@@ -181,31 +167,22 @@ def generateBatchWithoutLabel(directory,file, shape, of, binary, frame_number,la
                     prev_frame = frame
                     continue
                 of_frame = opticalFlow(prev_frame, frame)
+                
+                if ISTEST:
+                    output_of_frame = "{}optical/frame_of_{}.png".format(TEST_ROOT,str(count))
+                    output_frame = "{}output/frame_{}.png".format(TEST_ROOT,str(count))
+                    cv2.imwrite(output_of_frame,of_frame)
+                    cv2.imwrite(output_frame,frame)
                 prev_frame = frame
                 frame = of_frame
+               
 
             queue.append(frame)
-            batch = queue.copy()
-
             
-            if len(batch) == frame_number:
-                # strict output number of data with label 0
-                if labels[count] == '0':
-                    if labelBalance:
-                        if non_hit_count <= hit_count:
-                            batches.append((batch, labels[count]))
-                            non_hit_count += 1
-                    else:
-                        batches.append((batch, labels[count]))
-                        non_hit_count += 1
-                else:
-                    if binary:
-                        batches.append((batch, '1'))
-                    else:
-                        batches.append((batch, labels[count]))
-                    hit_count += 1
-                # test save images
-               
+            if len(queue) == frame_number:
+                batch = queue.copy()
+                batches.append((batch))
+
             count += 1
         else:
             break
@@ -294,7 +271,6 @@ if __name__ == "__main__":
     # filename = "labeledvideo5.mp4"
 
     # ---- generate batchs ----
-    # batches = generateBatches(DATA_ROOT, of = True, frame_number = 7)
+    batches = generateBatchWithoutLabel(TEST_ROOT, "d2_1_r0_c0.mp4",SHAPE,True,True, 5, False)
     # print("batches:",len(batches))
-   
     pass
