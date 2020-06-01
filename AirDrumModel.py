@@ -125,7 +125,7 @@ class modelFramewrok():
         print("[train] end")
     
     def test(self,input_path,file_name):
-        batches = generateBatch(input_path,file_name, self.shape, self.optical_flow,self.binary_output,5,self.labelBalance)
+        batches = bg.generateBatch(input_path,file_name, self.shape, self.optical_flow,self.binary_output,5,self.labelBalance)
         input_data, output_data = zip(*batches)
         i = np.array(input_data)
         o = np.array(output_data) 
